@@ -1,12 +1,10 @@
 #!/bin/bash
 set -e
 
-# Charger les variables d'environnement
 if [ -f .env ]; then
   export $(grep -v '^#' .env | xargs)
 fi
 
-MINIO_ALIAS="local"
 MINIO_URL="http://127.0.0.1:9002"
 PRIVATE_BUCKET="${PRIVATE_BUCKET:-private}"
 PUBLIC_BUCKET="${PUBLIC_BUCKET:-public}"
@@ -17,40 +15,30 @@ until curl -sf "${MINIO_URL}/minio/health/live" > /dev/null; do
 done
 echo "==> MinIO est prêt."
 
-echo "==> Configuration du client mc..."
+PUBLIC_POLICY=$(sed "s/PUBLIC_BUCKET_NAME/${PUBLIC_BUCKET}/g" policies/public-read.json)
+
+echo "==> Configuration des buckets..."
 docker run --rm --network host \
-  quay.io/minio/mc \
-  alias set "${MINIO_ALIAS}" "${MINIO_URL}" "${MINIO_ROOT_USER}" "${MINIO_ROOT_PASSWORD}"
+  -e MC_HOST_local="${MINIO_URL%/}" \
+  -e MINIO_USER="${MINIO_ROOT_USER}" \
+  -e MINIO_PASS="${MINIO_ROOT_PASSWORD}" \
+  -e PRIVATE_BUCKET="${PRIVATE_BUCKET}" \
+  -e PUBLIC_BUCKET="${PUBLIC_BUCKET}" \
+  -e PUBLIC_POLICY="${PUBLIC_POLICY}" \
+  --entrypoint sh quay.io/minio/mc -c "
+    mc alias set local http://127.0.0.1:9002 \${MINIO_USER} \${MINIO_PASS}
 
-echo "==> Création du bucket privé : ${PRIVATE_BUCKET}"
-docker run --rm --network host \
-  quay.io/minio/mc \
-  mb --ignore-existing "${MINIO_ALIAS}/${PRIVATE_BUCKET}"
+    echo '-- Bucket privé : '\${PRIVATE_BUCKET}
+    mc mb --ignore-existing local/\${PRIVATE_BUCKET}
+    mc anonymous set none local/\${PRIVATE_BUCKET}
 
-docker run --rm --network host \
-  quay.io/minio/mc \
-  anonymous set none "${MINIO_ALIAS}/${PRIVATE_BUCKET}"
+    echo '-- Bucket public : '\${PUBLIC_BUCKET}
+    mc mb --ignore-existing local/\${PUBLIC_BUCKET}
+    echo \"\${PUBLIC_POLICY}\" > /tmp/public-read.json
+    mc anonymous set-json /tmp/public-read.json local/\${PUBLIC_BUCKET}
 
-echo "==> Bucket privé configuré (aucun accès public)."
+    echo '-- Buckets créés :'
+    mc ls local
+  "
 
-echo "==> Création du bucket public : ${PUBLIC_BUCKET}"
-docker run --rm --network host \
-  quay.io/minio/mc \
-  mb --ignore-existing "${MINIO_ALIAS}/${PUBLIC_BUCKET}"
-
-# Appliquer la policy de lecture publique
-POLICY_FILE="/tmp/public-read.json"
-POLICY_CONTENT=$(sed "s/PUBLIC_BUCKET_NAME/${PUBLIC_BUCKET}/g" policies/public-read.json)
-
-docker run --rm --network host \
-  -e POLICY="${POLICY_CONTENT}" \
-  quay.io/minio/mc \
-  sh -c "echo \"\$POLICY\" > ${POLICY_FILE} && mc anonymous set-json ${POLICY_FILE} ${MINIO_ALIAS}/${PUBLIC_BUCKET}"
-
-echo "==> Bucket public configuré (lecture publique activée)."
-
-echo ""
-echo "Buckets configurés :"
-docker run --rm --network host \
-  quay.io/minio/mc \
-  ls "${MINIO_ALIAS}"
+echo "==> Buckets configurés avec succès."
