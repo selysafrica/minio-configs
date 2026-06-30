@@ -1,0 +1,83 @@
+# Configuration pour la Console Web (Interface d'administration)
+server {
+    server_name minio.selys.app;
+
+    # Sécurité : Augmenter la taille maximale des uploads
+    client_max_body_size 1000M;
+
+    location / {
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-NginX-Proxy true;
+
+        # Support des WebSockets (obligatoire pour la console MinIO)
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        proxy_pass http://127.0.0.1:9001; # Port de la Console MinIO
+    }
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/minio.selys.app/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/minio.selys.app/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+}
+
+# Configuration pour l'API S3 (Chargement et accès aux fichiers)
+server {
+    server_name s3.selys.app;
+
+    client_max_body_size 1000M;
+
+    location / {
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_connect_timeout 300;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        chunked_transfer_encoding on;
+
+        proxy_pass http://127.0.0.1:9002; # Port de l'API S3 MinIO
+    }
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/minio.selys.app/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/minio.selys.app/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+}
+
+
+server {
+    if ($host = minio.selys.app) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    listen 80;
+    server_name minio.selys.app;
+    return 404; # managed by Certbot
+
+
+}
+server {
+    if ($host = s3.selys.app) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    listen 80;
+    server_name s3.selys.app;
+    return 404; # managed by Certbot
+
+
+}
