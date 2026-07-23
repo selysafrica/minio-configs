@@ -1,8 +1,8 @@
 NGINX_CONF_SRC  = nginx/minio.v2.conf
 NGINX_CONF_DEST = /etc/nginx/sites-available/minio.v2.conf
 NGINX_ENABLED   = /etc/nginx/sites-enabled/minio.v2.conf
-MINIO_SERVER_URL = s3.selys.app
-MINIO_CONSOLE_URL = minio.selys.app
+MINIO_SERVER_URL = s3.v2.selys.app
+MINIO_CONSOLE_URL = minio.v2.selys.app
 CERTBOT_EMAIL   ?= dev@selys-africa.com
 
 .PHONY: all setup deploy stop restart logs status nginx-setup ssl buckets clean

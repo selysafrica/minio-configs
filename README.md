@@ -100,7 +100,7 @@ make clean      # Supprimer toutes les données (DESTRUCTIF)
                        │
           ┌────────────┴────────────┐
           │                         │
-       :9001                     :9002
+       :9011                     :9022
      (Console)                  (API S3)
           └────────────┬────────────┘
                   MinIO (Docker)

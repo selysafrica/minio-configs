@@ -5,15 +5,15 @@ services:
     image: quay.io/minio/minio:latest
     container_name: minio_storage
     ports:
-      - "9002:9000"  # Port de l'API S3 (utilisé par vos applications)
-      - "9001:9001"  # Port de la console Web (interface d'administration)
+      - "9022:9000"  # Port de l'API S3 (utilisé par vos applications)
+      - "9011:9011"  # Port de la console Web (interface d'administration)
     environment:
       MINIO_ROOT_USER: "*******"
       MINIO_ROOT_PASSWORD: "******"
       # Les deux lignes à ajouter pour régler le problème de redirection HTTPS :
-      MINIO_SERVER_URL: "https://s3.selys.app"
-      MINIO_BROWSER_REDIRECT_URL: "https://minio.selys.app"
+      MINIO_SERVER_URL: "https://s3.v2.selys.app"
+      MINIO_BROWSER_REDIRECT_URL: "https://minio.v2.selys.app"
     volumes:
       - ./data:/data  # Dossier local pour garantir la persistance des fichiers
-    command: server /data --console-address ":9001"
+    command: server /data --console-address ":9011"
     restart: unless-stopped
