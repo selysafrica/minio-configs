@@ -5,7 +5,7 @@ if [ -f .env ]; then
   export $(grep -v '^#' .env | xargs)
 fi
 
-MINIO_API_URL="http://127.0.0.1:9055"
+MINIO_API_URL="http://127.0.0.1:9002"
 PRIVATE_BUCKET="${PRIVATE_BUCKET:-private}"
 PUBLIC_BUCKET="${PUBLIC_BUCKET:-public}"
 
