@@ -1,14 +1,19 @@
-NGINX_CONF_SRC  = nginx/minio.conf
-NGINX_CONF_DEST = /etc/nginx/sites-available/minio.conf
-NGINX_ENABLED   = /etc/nginx/sites-enabled/minio.conf
-CERTBOT_EMAIL   ?= karimadio40@gmail.com
+NGINX_CONF_SRC  = nginx/minio.v2.conf
+NGINX_CONF_DEST = /etc/nginx/sites-available/minio.v2.conf
+NGINX_ENABLED   = /etc/nginx/sites-enabled/minio.v2.conf
+MINIO_SERVER_URL = s3.v2.selys.app
+MINIO_CONSOLE_URL = minio.v2.selys.app
+CERTBOT_EMAIL   ?= dev@selys-africa.com
 
 .PHONY: all setup deploy stop restart logs status nginx-setup ssl buckets clean
 
 all: deploy
 
 # Première installation complète sur un nouveau VPS
-setup: _check-env _create-data-dir nginx-setup ssl deploy buckets
+# setup: _check-env _create-data-dir nginx-setup ssl deploy buckets
+# 	@echo "==> MinIO déployé et accessible."
+
+setup: _check-env _create-data-dir deploy buckets
 	@echo "==> MinIO déployé et accessible."
 
 # Démarrer les conteneurs
@@ -45,8 +50,8 @@ nginx-setup:
 ssl:
 	@echo "==> Génération des certificats SSL..."
 	sudo certbot --nginx \
-		-d minio.selys.app \
-		-d s3.selys.app \
+		-d $(MINIO_CONSOLE_URL) \
+		-d $(MINIO_SERVER_URL) \
 		--non-interactive \
 		--agree-tos \
 		--email $(CERTBOT_EMAIL)
