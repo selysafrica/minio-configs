@@ -93,8 +93,11 @@ init-buckets: ## Créer les buckets par défaut (public + private)
 # ──────────────────────────────────────────────
 
 nginx: ## Installer la config Nginx pour MinIO
-	sudo cp $(K8S_DIR)/nginx/minio.conf $(NGINX_CONF_DIR)/$(DOMAIN_API)
+	sudo rm -f $(NGINX_ENABLED_DIR)/minio.conf $(NGINX_CONF_DIR)/minio.conf 2>/dev/null || true
+	sudo cp $(K8S_DIR)/nginx/s3.selys.app $(NGINX_CONF_DIR)/$(DOMAIN_API)
+	sudo cp $(K8S_DIR)/nginx/minio.selys.app $(NGINX_CONF_DIR)/$(DOMAIN_CONSOLE)
 	sudo ln -sf $(NGINX_CONF_DIR)/$(DOMAIN_API) $(NGINX_ENABLED_DIR)/$(DOMAIN_API)
+	sudo ln -sf $(NGINX_CONF_DIR)/$(DOMAIN_CONSOLE) $(NGINX_ENABLED_DIR)/$(DOMAIN_CONSOLE)
 	sudo nginx -t
 	sudo systemctl reload nginx
 	@echo "Configuration Nginx installée et rechargée."
@@ -139,8 +142,8 @@ clean-all: ## Supprimer TOUT (y compris PV, namespace et données)
 	if [ "$$confirm" = "y" ] || [ "$$confirm" = "Y" ]; then \
 		kubectl delete namespace $(NAMESPACE) --ignore-not-found; \
 		kubectl delete pv minio-pv --ignore-not-found; \
-		sudo rm -f $(NGINX_ENABLED_DIR)/minio.selys.app; \
-		sudo rm -f $(NGINX_CONF_DIR)/minio.selys.app; \
+		sudo rm -f $(NGINX_ENABLED_DIR)/$(DOMAIN_API) $(NGINX_ENABLED_DIR)/$(DOMAIN_CONSOLE); \
+		sudo rm -f $(NGINX_CONF_DIR)/$(DOMAIN_API) $(NGINX_CONF_DIR)/$(DOMAIN_CONSOLE); \
 		sudo systemctl reload nginx 2>/dev/null || true; \
 		echo "Tout a été supprimé."; \
 	else \
