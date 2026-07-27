@@ -1,7 +1,7 @@
 SHELL := /bin/bash
 NAMESPACE := minio
-DOMAIN_API := minio.selys.app
-DOMAIN_CONSOLE := s3.selys.app
+DOMAIN_API := s3.selys.app
+DOMAIN_CONSOLE := minio.selys.app
 NGINX_CONF_DIR := /etc/nginx/sites-available
 NGINX_ENABLED_DIR := /etc/nginx/sites-enabled
 K8S_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
