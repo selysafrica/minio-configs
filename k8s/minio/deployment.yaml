@@ -25,13 +25,13 @@ spec:
             - server
             - /data
             - --console-address
-            - ":30023"
+            - ":9001"
           ports:
             - name: api
               containerPort: 9000
               protocol: TCP
             - name: console
-              containerPort: 30023
+              containerPort: 9001
               protocol: TCP
           env:
             - name: MINIO_ROOT_USER

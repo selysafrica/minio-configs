@@ -29,7 +29,7 @@ spec:
     app: minio
   ports:
     - name: console
-      port: 30023
-      targetPort: 30023
+      port: 9001
+      targetPort: 9001
       nodePort: 30023
       protocol: TCP
