@@ -10,16 +10,8 @@ fi
 
 MINIO_HOST="${MINIO_ROOT_USER:-minioadmin}"
 MINIO_PASS="${MINIO_ROOT_PASSWORD:-changeme123}"
-MINIO_API_URL="https://s3.selys.app"
 PRIVATE_BUCKET="${PRIVATE_BUCKET:-private}"
 PUBLIC_BUCKET="${PUBLIC_BUCKET:-public}"
-
-echo "==> Attente du démarrage de MinIO..."
-until curl -sf "${MINIO_API_URL}/minio/health/live" -k > /dev/null 2>&1; do
-  echo "    MinIO pas encore prêt, nouvelle tentative dans 3s..."
-  sleep 3
-done
-echo "==> MinIO est prêt."
 
 MINIO_POD=$(kubectl get pods -n minio -l app=minio -o jsonpath='{.items[0].metadata.name}')
 
@@ -29,6 +21,13 @@ if [ -z "$MINIO_POD" ]; then
 fi
 
 echo "==> Pod MinIO détecté: ${MINIO_POD}"
+
+echo "==> Attente du démarrage de MinIO..."
+until kubectl exec -n minio "${MINIO_POD}" -- curl -sf http://localhost:9000/minio/health/live > /dev/null 2>&1; do
+  echo "    MinIO pas encore prêt, nouvelle tentative dans 3s..."
+  sleep 3
+done
+echo "==> MinIO est prêt."
 
 PUBLIC_POLICY=$(sed "s/PUBLIC_BUCKET_NAME/${PUBLIC_BUCKET}/g" "${PROJECT_DIR}/policies/public-read.json")
 

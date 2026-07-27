@@ -45,9 +45,9 @@ spec:
                   name: minio-credentials
                   key: MINIO_ROOT_PASSWORD
             - name: MINIO_SERVER_URL
-              value: "https://s3.selys.app"
+              value: "http://s3.selys.app"
             - name: MINIO_BROWSER_REDIRECT_URL
-              value: "https://minio.selys.app"
+              value: "http://minio.selys.app"
           volumeMounts:
             - name: minio-storage
               mountPath: /data
