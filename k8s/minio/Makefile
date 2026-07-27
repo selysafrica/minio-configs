@@ -94,7 +94,7 @@ init-buckets: ## Créer les buckets par défaut (public + private)
 
 nginx: ## Installer la config Nginx pour MinIO
 	sudo cp $(K8S_DIR)/nginx/minio.conf $(NGINX_CONF_DIR)/$(DOMAIN_API)
-	sudo ln -sf $(NGINX_CONF_DIR)/minio.conf $(NGINX_ENABLED_DIR)/$(DOMAIN_API)
+	sudo ln -sf $(NGINX_CONF_DIR)/$(DOMAIN_API) $(NGINX_ENABLED_DIR)/$(DOMAIN_API)
 	sudo nginx -t
 	sudo systemctl reload nginx
 	@echo "Configuration Nginx installée et rechargée."
