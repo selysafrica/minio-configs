@@ -9,7 +9,7 @@ if [ -f "${PROJECT_DIR}/.env" ]; then
 fi
 
 ADMIN_TOKEN="${GARAGE_ADMIN_TOKEN}"
-ADMIN_URL="https://127.0.0.1:3331"
+ADMIN_URL="http://127.0.0.1:3331"
 PRIVATE_BUCKET="${PRIVATE_BUCKET:-private}"
 PUBLIC_BUCKET="${PUBLIC_BUCKET:-public}"
 
