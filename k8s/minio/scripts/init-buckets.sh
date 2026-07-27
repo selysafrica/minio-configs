@@ -10,7 +10,7 @@ fi
 
 MINIO_HOST="${MINIO_ROOT_USER:-minioadmin}"
 MINIO_PASS="${MINIO_ROOT_PASSWORD:-changeme123}"
-MINIO_API_URL="https://minio.selys.app:9001"
+MINIO_API_URL="https://minio.selys.app:30001"
 PRIVATE_BUCKET="${PRIVATE_BUCKET:-private}"
 PUBLIC_BUCKET="${PUBLIC_BUCKET:-public}"
 

@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: garagehq-meta-pv
+  labels:
+    app: garagehq
+    type: meta
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual-garage
+  hostPath:
+    path: /data/garagehq/meta
+    type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: garagehq-data-pv
+  labels:
+    app: garagehq
+    type: data
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual-garage
+  hostPath:
+    path: /data/garagehq/data
+    type: DirectoryOrCreate
