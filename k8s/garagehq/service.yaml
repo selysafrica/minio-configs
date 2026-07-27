@@ -13,7 +13,7 @@ spec:
     - name: s3-api
       port: 3900
       targetPort: 3900
-      nodePort: 3333
+      nodePort: 30033
       protocol: TCP
 ---
 apiVersion: v1
@@ -31,7 +31,7 @@ spec:
     - name: admin
       port: 3903
       targetPort: 3903
-      nodePort: 3331
+      nodePort: 30031
       protocol: TCP
 ---
 apiVersion: v1
