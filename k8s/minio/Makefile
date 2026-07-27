@@ -139,8 +139,8 @@ clean-all: ## Supprimer TOUT (y compris PV, namespace et données)
 	if [ "$$confirm" = "y" ] || [ "$$confirm" = "Y" ]; then \
 		kubectl delete namespace $(NAMESPACE) --ignore-not-found; \
 		kubectl delete pv minio-pv --ignore-not-found; \
-		sudo rm -f $(NGINX_ENABLED_DIR)/minio.conf; \
-		sudo rm -f $(NGINX_CONF_DIR)/minio.conf; \
+		sudo rm -f $(NGINX_ENABLED_DIR)/minio.selys.app; \
+		sudo rm -f $(NGINX_CONF_DIR)/minio.selys.app; \
 		sudo systemctl reload nginx 2>/dev/null || true; \
 		echo "Tout a été supprimé."; \
 	else \
