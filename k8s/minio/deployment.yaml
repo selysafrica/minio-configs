@@ -24,13 +24,13 @@ spec:
             - server
             - /data
             - --console-address
-            - ":30001"
+            - ":30023"
           ports:
             - name: api
               containerPort: 9000
               protocol: TCP
             - name: console
-              containerPort: 30001
+              containerPort: 30023
               protocol: TCP
           env:
             - name: MINIO_ROOT_USER
@@ -44,9 +44,9 @@ spec:
                   name: minio-credentials
                   key: MINIO_ROOT_PASSWORD
             - name: MINIO_SERVER_URL
-              value: "https://minio.selys.app:30001"
+              value: "https://minio.selys.app:30021"
             - name: MINIO_BROWSER_REDIRECT_URL
-              value: "https://minio.selys.app:9002"
+              value: "https://console.minio.selys.app"
           volumeMounts:
             - name: minio-storage
               mountPath: /data
