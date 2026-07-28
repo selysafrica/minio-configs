@@ -14,6 +14,12 @@ YELLOW := \033[1;33m
 CYAN := \033[0;36m
 NC := \033[0m
 
+DOMAIN_API := s3.selys.app
+DOMAIN_CONSOLE := minio.selys.app
+NGINX_AVAILABLE_DIR := /etc/nginx/sites-available
+NGINX_ENABLED_DIR := /etc/nginx/sites-enabled
+COMPOSE := docker compose
+
 help: ## Affiche cette aide
 	@echo ""
 	@echo -e "$(CYAN)╔════════════════════════════════════════════════════════════╗$(NC)"
@@ -25,28 +31,28 @@ help: ## Affiche cette aide
 
 build: ## Build les images Docker
 	@echo -e "$(YELLOW)🔨 Build des images...$(NC)"
-	docker-compose build
+	$(COMPOSE) build
 
 up: ## Démarre MinIO en arrière-plan
 	@echo -e "$(GREEN)🚀 Démarrage de MinIO...$(NC)"
-	docker-compose up -d
+	$(COMPOSE) up -d
 	@echo -e "$(GREEN)✅ MinIO démarré !$(NC)"
 	@echo -e "$(CYAN)   API S3    : http://localhost:$(MINIO_API_PORT)$(NC)"
 	@echo -e "$(CYAN)   Console   : http://localhost:$(MINIO_CONSOLE_PORT)$(NC)"
 
 down: ## Arrête MinIO
 	@echo -e "$(YELLOW)🛑 Arrêt de MinIO...$(NC)"
-	docker-compose down
+	$(COMPOSE) down
 
 restart: down up ## Redémarre MinIO
 
 logs: ## Affiche les logs en temps réel
 	@echo -e "$(CYAN)📋 Logs MinIO (Ctrl+C pour quitter)...$(NC)"
-	docker-compose logs -f
+	$(COMPOSE) logs -f
 
 status: ## Affiche le statut des conteneurs
 	@echo -e "$(CYAN)📊 Statut des conteneurs :$(NC)"
-	docker-compose ps
+	$(COMPOSE) ps
 
 setup: ## Configure Nginx + démarre MinIO + crée les buckets
 	@echo -e "$(YELLOW)🔧 Configuration complète...$(NC)"
@@ -63,19 +69,19 @@ buckets: ## Crée les buckets public et private
 
 nginx-setup: ## Installe les configs Nginx (nécessite sudo)
 	@echo -e "$(YELLOW)🌐 Installation des configs Nginx...$(NC)"
-	@sudo cp nginx/s3.selys.app.conf /etc/nginx/sites-available/s3.selys.app
-	@sudo cp nginx/minio.selys.app.conf /etc/nginx/sites-available/minio.selys.app
-	@sudo ln -sf /etc/nginx/sites-available/s3.selys.app /etc/nginx/sites-enabled/s3.selys.app 2>/dev/null || true
-	@sudo ln -sf /etc/nginx/sites-available/minio.selys.app /etc/nginx/sites-enabled/minio.selys.app 2>/dev/null || true
+	@sudo cp nginx/s3.selys.app.conf $(NGINX_AVAILABLE_DIR)/$(DOMAIN_API)
+	@sudo cp nginx/minio.selys.app.conf $(NGINX_AVAILABLE_DIR)/$(DOMAIN_CONSOLE)
+	@sudo ln -sf $(NGINX_AVAILABLE_DIR)/$(DOMAIN_API) $(NGINX_ENABLED_DIR)/$(DOMAIN_API) 2>/dev/null || true
+	@sudo ln -sf $(NGINX_AVAILABLE_DIR)/$(DOMAIN_CONSOLE) $(NGINX_ENABLED_DIR)/$(DOMAIN_CONSOLE) 2>/dev/null || true
 	@sudo nginx -t && sudo systemctl reload nginx
 	@echo -e "$(GREEN)✅ Nginx configuré !$(NC)"
 
 nginx-remove: ## Supprime les configs Nginx
 	@echo -e "$(YELLOW)🗑️  Suppression des configs Nginx...$(NC)"
-	@sudo rm -f /etc/nginx/sites-enabled/s3.selys.app
-	@sudo rm -f /etc/nginx/sites-enabled/minio.selys.app
-	@sudo rm -f /etc/nginx/sites-available/s3.selys.app
-	@sudo rm -f /etc/nginx/sites-available/minio.selys.app
+	@sudo rm -f $(NGINX_ENABLED_DIR)/$(DOMAIN_API)
+	@sudo rm -f $(NGINX_ENABLED_DIR)/$(DOMAIN_CONSOLE)
+	@sudo rm -f $(NGINX_AVAILABLE_DIR)/$(DOMAIN_API)
+	@sudo rm -f $(NGINX_AVAILABLE_DIR)/$(DOMAIN_CONSOLE)
 	@sudo systemctl reload nginx
 	@echo -e "$(GREEN)✅ Configs Nginx supprimées !$(NC)"
 
@@ -91,45 +97,45 @@ certbot-renew: ## Renouvelle les certificats SSL
 
 update-ssl-nginx: ## Met à jour les configs Nginx pour HTTPS après certbot
 	@echo -e "$(YELLOW)📝 Mise à jour des configs Nginx pour HTTPS...$(NC)"
-	@sudo sed -i 's/# listen 443/listen 443/g' /etc/nginx/sites-available/s3.selys.app
-	@sudo sed -i 's/# listen 443/listen 443/g' /etc/nginx/sites-available/minio.selys.app
-	@sudo sed -i 's/# ssl_certificate/ssl_certificate/g' /etc/nginx/sites-available/s3.selys.app
-	@sudo sed -i 's/# ssl_certificate/ssl_certificate/g' /etc/nginx/sites-available/minio.selys.app
-	@sudo sed -i 's/# server {/server {/g' /etc/nginx/sites-available/s3.selys.app
-	@sudo sed -i 's/# server {/server {/g' /etc/nginx/sites-available/minio.selys.app
-	@sudo sed -i 's/#     listen 443/    listen 443/g' /etc/nginx/sites-available/s3.selys.app
-	@sudo sed -i 's/#     listen 443/    listen 443/g' /etc/nginx/sites-available/minio.selys.app
-	@sudo sed -i 's/#     ssl_certificate/    ssl_certificate/g' /etc/nginx/sites-available/s3.selys.app
-	@sudo sed -i 's/#     ssl_certificate/    ssl_certificate/g' /etc/nginx/sites-available/minio.selys.app
-	@sudo sed -i 's/#     location/    location/g' /etc/nginx/sites-available/s3.selys.app
-	@sudo sed -i 's/#     location/    location/g' /etc/nginx/sites-available/minio.selys.app
-	@sudo sed -i 's/#         proxy_pass/        proxy_pass/g' /etc/nginx/sites-available/s3.selys.app
-	@sudo sed -i 's/#         proxy_pass/        proxy_pass/g' /etc/nginx/sites-available/minio.selys.app
-	@sudo sed -i 's/#         proxy_set_header/        proxy_set_header/g' /etc/nginx/sites-available/s3.selys.app
-	@sudo sed -i 's/#         proxy_set_header/        proxy_set_header/g' /etc/nginx/sites-available/minio.selys.app
-	@sudo sed -i 's/#         proxy_connect/        proxy_connect/g' /etc/nginx/sites-available/s3.selys.app
-	@sudo sed -i 's/#         proxy_connect/        proxy_connect/g' /etc/nginx/sites-available/minio.selys.app
-	@sudo sed -i 's/#         proxy_http/        proxy_http/g' /etc/nginx/sites-available/s3.selys.app
-	@sudo sed -i 's/#         proxy_http/        proxy_http/g' /etc/nginx/sites-available/minio.selys.app
-	@sudo sed -i 's/#         chunked_transfer/        chunked_transfer/g' /etc/nginx/sites-available/s3.selys.app
-	@sudo sed -i 's/#         chunked_transfer/        chunked_transfer/g' /etc/nginx/sites-available/minio.selys.app
-	@sudo sed -i 's/#         proxy_set_header Upgrade/        proxy_set_header Upgrade/g' /etc/nginx/sites-available/minio.selys.app
-	@sudo sed -i 's/#         proxy_set_header Connection/        proxy_set_header Connection/g' /etc/nginx/sites-available/minio.selys.app
-	@sudo sed -i 's/#     }/    }/g' /etc/nginx/sites-available/s3.selys.app
-	@sudo sed -i 's/#     }/    }/g' /etc/nginx/sites-available/minio.selys.app
-	@sudo sed -i 's/# }/}/g' /etc/nginx/sites-available/s3.selys.app
-	@sudo sed -i 's/# }/}/g' /etc/nginx/sites-available/minio.selys.app
-	@sudo sed -i 's/# return 301/return 301/g' /etc/nginx/sites-available/s3.selys.app
-	@sudo sed -i 's/# return 301/return 301/g' /etc/nginx/sites-available/minio.selys.app
+	@sudo sed -i 's/# listen 443/listen 443/g' $(NGINX_AVAILABLE_DIR)/$(DOMAIN_API)
+	@sudo sed -i 's/# listen 443/listen 443/g' $(NGINX_AVAILABLE_DIR)/$(DOMAIN_CONSOLE)
+	@sudo sed -i 's/# ssl_certificate/ssl_certificate/g' $(NGINX_AVAILABLE_DIR)/$(DOMAIN_API)
+	@sudo sed -i 's/# ssl_certificate/ssl_certificate/g' $(NGINX_AVAILABLE_DIR)/$(DOMAIN_CONSOLE)
+	@sudo sed -i 's/# server {/server {/g' $(NGINX_AVAILABLE_DIR)/$(DOMAIN_API)
+	@sudo sed -i 's/# server {/server {/g' $(NGINX_AVAILABLE_DIR)/$(DOMAIN_CONSOLE)
+	@sudo sed -i 's/#     listen 443/    listen 443/g' $(NGINX_AVAILABLE_DIR)/$(DOMAIN_API)
+	@sudo sed -i 's/#     listen 443/    listen 443/g' $(NGINX_AVAILABLE_DIR)/$(DOMAIN_CONSOLE)
+	@sudo sed -i 's/#     ssl_certificate/    ssl_certificate/g' $(NGINX_AVAILABLE_DIR)/$(DOMAIN_API)
+	@sudo sed -i 's/#     ssl_certificate/    ssl_certificate/g' $(NGINX_AVAILABLE_DIR)/$(DOMAIN_CONSOLE)
+	@sudo sed -i 's/#     location/    location/g' $(NGINX_AVAILABLE_DIR)/$(DOMAIN_API)
+	@sudo sed -i 's/#     location/    location/g' $(NGINX_AVAILABLE_DIR)/$(DOMAIN_CONSOLE)
+	@sudo sed -i 's/#         proxy_pass/        proxy_pass/g' $(NGINX_AVAILABLE_DIR)/$(DOMAIN_API)
+	@sudo sed -i 's/#         proxy_pass/        proxy_pass/g' $(NGINX_AVAILABLE_DIR)/$(DOMAIN_CONSOLE)
+	@sudo sed -i 's/#         proxy_set_header/        proxy_set_header/g' $(NGINX_AVAILABLE_DIR)/$(DOMAIN_API)
+	@sudo sed -i 's/#         proxy_set_header/        proxy_set_header/g' $(NGINX_AVAILABLE_DIR)/$(DOMAIN_CONSOLE)
+	@sudo sed -i 's/#         proxy_connect/        proxy_connect/g' $(NGINX_AVAILABLE_DIR)/$(DOMAIN_API)
+	@sudo sed -i 's/#         proxy_connect/        proxy_connect/g' $(NGINX_AVAILABLE_DIR)/$(DOMAIN_CONSOLE)
+	@sudo sed -i 's/#         proxy_http/        proxy_http/g' $(NGINX_AVAILABLE_DIR)/$(DOMAIN_API)
+	@sudo sed -i 's/#         proxy_http/        proxy_http/g' $(NGINX_AVAILABLE_DIR)/$(DOMAIN_CONSOLE)
+	@sudo sed -i 's/#         chunked_transfer/        chunked_transfer/g' $(NGINX_AVAILABLE_DIR)/$(DOMAIN_API)
+	@sudo sed -i 's/#         chunked_transfer/        chunked_transfer/g' $(NGINX_AVAILABLE_DIR)/$(DOMAIN_CONSOLE)
+	@sudo sed -i 's/#         proxy_set_header Upgrade/        proxy_set_header Upgrade/g' $(NGINX_AVAILABLE_DIR)/$(DOMAIN_CONSOLE)
+	@sudo sed -i 's/#         proxy_set_header Connection/        proxy_set_header Connection/g' $(NGINX_AVAILABLE_DIR)/$(DOMAIN_CONSOLE)
+	@sudo sed -i 's/#     }/    }/g' $(NGINX_AVAILABLE_DIR)/$(DOMAIN_API)
+	@sudo sed -i 's/#     }/    }/g' $(NGINX_AVAILABLE_DIR)/$(DOMAIN_CONSOLE)
+	@sudo sed -i 's/# }/}/g' $(NGINX_AVAILABLE_DIR)/$(DOMAIN_API)
+	@sudo sed -i 's/# }/}/g' $(NGINX_AVAILABLE_DIR)/$(DOMAIN_CONSOLE)
+	@sudo sed -i 's/# return 301/return 301/g' $(NGINX_AVAILABLE_DIR)/$(DOMAIN_API)
+	@sudo sed -i 's/# return 301/return 301/g' $(NGINX_AVAILABLE_DIR)/$(DOMAIN_CONSOLE)
 	@sudo nginx -t && sudo systemctl reload nginx
 	@echo -e "$(GREEN)✅ Configs Nginx mises à jour pour HTTPS !$(NC)"
 
 clean: ## Supprime tout (conteneurs, volumes, données)
 	@echo -e "$(RED)🗑️  Suppression complète...$(NC)"
-	@docker-compose down -v --remove-orphans
+	@$(COMPOSE) down -v --remove-orphans
 	@docker rmi minio/minio:latest 2>/dev/null || true
 	@echo -e "$(GREEN)✅ Nettoyage terminé !$(NC)"
 
 prune: ## Nettoie les images Docker inutilisées
 	@echo -e "$(YELLOW)🧹 Nettoyage des images Docker...$(NC)"
-	@docker system prune -f
+	@$(COMPOSE) prune -f
