@@ -102,15 +102,15 @@ logs: ## Afficher les logs GarageHQ
 
 garage-status: ## Afficher le statut du cluster Garage
 	@GARAGE_POD=$$(kubectl get pods -n $(NAMESPACE) -l app=garagehq -o jsonpath='{.items[0].metadata.name}'); \
-	kubectl exec -n $(NAMESPACE) "$$GARAGE_POD" -- garage status
+	kubectl exec -n $(NAMESPACE) "$$GARAGE_POD" -- /garage status
 
 garage-key-list: ## Lister les clés API
 	@GARAGE_POD=$$(kubectl get pods -n $(NAMESPACE) -l app=garagehq -o jsonpath='{.items[0].metadata.name}'); \
-	kubectl exec -n $(NAMESPACE) "$$GARAGE_POD" -- garage key list
+	kubectl exec -n $(NAMESPACE) "$$GARAGE_POD" -- /garage key list
 
 garage-bucket-list: ## Lister les buckets
 	@GARAGE_POD=$$(kubectl get pods -n $(NAMESPACE) -l app=garagehq -o jsonpath='{.items[0].metadata.name}'); \
-	kubectl exec -n $(NAMESPACE) "$$GARAGE_POD" -- garage bucket list
+	kubectl exec -n $(NAMESPACE) "$$GARAGE_POD" -- /garage bucket list
 
 # ──────────────────────────────────────────────
 # Buckets
