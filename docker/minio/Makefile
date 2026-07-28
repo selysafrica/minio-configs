@@ -69,8 +69,8 @@ buckets: ## Crée les buckets public et private
 
 nginx-setup: ## Installe les configs Nginx (nécessite sudo)
 	@echo -e "$(YELLOW)🌐 Installation des configs Nginx...$(NC)"
-	@sudo cp nginx/s3.selys.app.conf $(NGINX_AVAILABLE_DIR)/$(DOMAIN_API)
-	@sudo cp nginx/minio.selys.app.conf $(NGINX_AVAILABLE_DIR)/$(DOMAIN_CONSOLE)
+	@sudo cp nginx/s3.v2.selys.app.conf $(NGINX_AVAILABLE_DIR)/$(DOMAIN_API)
+	@sudo cp nginx/minio.v2.selys.app.conf $(NGINX_AVAILABLE_DIR)/$(DOMAIN_CONSOLE)
 	@sudo ln -sf $(NGINX_AVAILABLE_DIR)/$(DOMAIN_API) $(NGINX_ENABLED_DIR)/$(DOMAIN_API) 2>/dev/null || true
 	@sudo ln -sf $(NGINX_AVAILABLE_DIR)/$(DOMAIN_CONSOLE) $(NGINX_ENABLED_DIR)/$(DOMAIN_CONSOLE) 2>/dev/null || true
 	@sudo nginx -t && sudo systemctl reload nginx

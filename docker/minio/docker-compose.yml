@@ -5,7 +5,7 @@ services:
     image: minio/minio:latest
     container_name: minio_v2
     restart: unless-stopped
-    command: server /data_v2 --console-address ":9011"
+    command: server /data_v2 --console-address ":9001"
     ports:
       - "9011:9000"   # API S3 exposé sur le port 9011 de l'hôte
       - "9012:9001"   # Console Dashboard exposé sur le port 9012 de l'hôte
@@ -21,7 +21,7 @@ services:
       - MINIO_DOMAIN=${MINIO_DOMAIN}
       - MINIO_SERVER_URL=${MINIO_SERVER_URL}
     networks:
-      - minio-network
+      - minio-v2-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s
@@ -30,5 +30,5 @@ services:
       start_period: 10s
 
 networks:
-  minio-network:
+  minio-v2-network:
     driver: bridge
