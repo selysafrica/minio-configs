@@ -18,7 +18,7 @@ fi
 
 MINIO_USER=${MINIO_ROOT_USER:-minioadmin}
 MINIO_PASS=${MINIO_ROOT_PASSWORD:-minioadmin}
-API_URL="http://localhost:9001"
+API_URL="http://localhost:9011"
 
 echo -e "${YELLOW}⏳ Attente du démarrage de MinIO...${NC}"
 

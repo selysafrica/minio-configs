@@ -5,10 +5,10 @@ services:
     image: minio/minio:latest
     container_name: minio
     restart: unless-stopped
-    command: server /data --console-address ":9001"
+    command: server /data --console-address ":9011"
     ports:
-      - "9001:9000"   # API S3 exposé sur le port 9001 de l'hôte
-      - "9002:9001"   # Console Dashboard exposé sur le port 9002 de l'hôte
+      - "9011:9000"   # API S3 exposé sur le port 9011 de l'hôte
+      - "9012:9001"   # Console Dashboard exposé sur le port 9012 de l'hôte
     volumes:
       - ./data:/data
       - ./certs:/root/.minio/certs

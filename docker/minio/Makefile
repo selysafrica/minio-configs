@@ -14,8 +14,8 @@ YELLOW := \033[1;33m
 CYAN := \033[0;36m
 NC := \033[0m
 
-DOMAIN_API := s3.selys.app
-DOMAIN_CONSOLE := minio.selys.app
+DOMAIN_API := s3.v2.selys.app
+DOMAIN_CONSOLE := minio.v2.selys.app
 NGINX_AVAILABLE_DIR := /etc/nginx/sites-available
 NGINX_ENABLED_DIR := /etc/nginx/sites-enabled
 COMPOSE := docker compose
