@@ -17,7 +17,7 @@ services:
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-minioadmin}
       - MINIO_BROWSER_REDIRECT_URL=https://minio.selys.app
       - MINIO_DOMAIN=s3.selys.app
-      # - MINIO_SERVER_URL=https://s3.selys.app
+      - MINIO_SERVER_URL=https://s3.selys.app
     networks:
       - minio-network
     healthcheck:
