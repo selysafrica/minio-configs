@@ -17,7 +17,7 @@ services:
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
       - MINIO_BROWSER_REDIRECT_URL=${MINIO_BROWSER_REDIRECT_URL}
       - MINIO_DOMAIN=${MINIO_DOMAIN}
-      - MINIO_SERVER_URL=${MINIO_SERVER_URL}
+      # - MINIO_SERVER_URL=${MINIO_SERVER_URL}
     networks:
       - minio-v2-network
     healthcheck:
