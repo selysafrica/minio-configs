@@ -133,7 +133,7 @@ update-ssl-nginx: ## Met à jour les configs Nginx pour HTTPS après certbot
 clean: ## Supprime tout (conteneurs, volumes, données)
 	@echo -e "$(RED)🗑️  Suppression complète...$(NC)"
 	@$(COMPOSE) down -v --remove-orphans
-	@docker rmi minio/minio:latest 2>/dev/null || true
+# 	@docker rmi minio/minio:latest 2>/dev/null || true
 	@echo -e "$(GREEN)✅ Nettoyage terminé !$(NC)"
 
 prune: ## Nettoie les images Docker inutilisées
