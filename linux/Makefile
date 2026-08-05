@@ -19,7 +19,7 @@ DOMAIN_API     := $(API_DOMAIN)
 DOMAIN_CONSOLE := $(CONSOLE_DOMAIN)
 CONTAINER_NAME := aistor-server
 ALIAS_NAME := selysafrica
-LICENSE_PATH := $$HOME/aistro/minio/minio.license:/minio.license
+LICENSE_PATH := $$HOME/aistro/minio/minio.license/minio.license
 NGINX_AVAILABLE_DIR := /etc/nginx/sites-available
 NGINX_ENABLED_DIR   := /etc/nginx/sites-enabled
 
@@ -48,7 +48,7 @@ deploy: ## Lance le conteneur MinIO AIstro
 		-p $(MINIO_API_PORT):9000 \
 		-p $(MINIO_CONSOLE_PORT):9001 \
 		-v $$HOME/aistro/minio/data:/mnt/data/aistro \
-		-v $(LICENSE_PATH) \
+		-v $(LICENSE_PATH):/minio.license \
 		-v $$HOME/aistro/minio/certs:/etc/aistro/minio/certs \
 		--name "$(CONTAINER_NAME)" \
 		--restart unless-stopped \
