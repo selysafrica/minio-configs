@@ -57,7 +57,7 @@ deploy: ## Lance le conteneur MinIO AIstro
 		quay.io/minio/aistor/minio:latest \
 		minio server /mnt/data/aistro \
 			--license /minio.license \
-			--console-address ":9012"
+			--console-address ":9001"
 	@echo -e "$(GREEN)✅ MinIO démarré !$(NC)"
 	@echo -e "$(GREEN)   • API     → http://localhost:$(MINIO_API_PORT)$(NC)"
 	@echo -e "$(GREEN)   • Console → http://localhost:$(MINIO_CONSOLE_PORT)$(NC)"
