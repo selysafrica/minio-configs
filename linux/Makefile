@@ -73,7 +73,7 @@ license:
 	@cp minio.license $(LICENSE_PATH)/minio.license
 	@echo -e "$(GREEN)✅ Licence copiée vers $(LICENSE_PATH)/minio.license$(NC)"
 	@echo -e "$(GREEN)✅ Enregistremet de la licence$(NC)"
-	mc license register $(ALIAS_NAME) --license $(LICENSE_PATH)
+	mc license register $(ALIAS_NAME) --license $(LICENSE_PATH)/minio.license
 	@echo -e "$(GREEN)✅ License activée$(NC)"
 
 
