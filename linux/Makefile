@@ -19,7 +19,7 @@ DOMAIN_API     := $(API_DOMAIN)
 DOMAIN_CONSOLE := $(CONSOLE_DOMAIN)
 CONTAINER_NAME := aistor-server
 ALIAS_NAME := codihub
-LICENSE_PATH := $$HOME/aistro/minio/minio.license/minio.license
+LICENSE_PATH := $$HOME/aistro/minio/minio.license
 NGINX_AVAILABLE_DIR := /etc/nginx/sites-available
 NGINX_ENABLED_DIR   := /etc/nginx/sites-enabled
 
@@ -70,8 +70,8 @@ init-alias:
 license:
 	@echo -e "$(YELLOW)📄 Copie du fichier de licence...$(NC)"
 	@mkdir -p $$HOME/aistro/minio/minio.license
-	@cp minio.license $$HOME/aistro/minio/minio.license/minio.license
-	@echo -e "$(GREEN)✅ Licence copiée vers $$HOME/aistro/minio/minio.license/minio.license$(NC)"
+	@cp minio.license $(LICENSE_PATH):/minio.license
+	@echo -e "$(GREEN)✅ Licence copiée vers $(LICENSE_PATH):/minio.license$(NC)"
 	@echo -e "$(GREEN)✅ Enregistremet de la licence$(NC)"
 	mc license register $(ALIAS_NAME) --license $(LICENSE_PATH)
 	@echo -e "$(GREEN)✅ License activée$(NC)"
