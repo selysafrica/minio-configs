@@ -50,7 +50,7 @@ deploy: ## Lance le conteneur MinIO AIstro
 		-e MINIO_ROOT_USER=$(MINIO_ROOT_USER) \
 		-e MINIO_ROOT_PASSWORD=$(MINIO_ROOT_PASSWORD) \
 		-v $$HOME/aistro/minio/data:/mnt/data/aistro \
-		-v $(LICENSE_PATH):/minio.license \
+		-v $(LICENSE_PATH)/minio.license \
 		-v $$HOME/aistro/minio/certs:/etc/aistro/minio/certs \
 		--name "$(CONTAINER_NAME)" \
 		--restart unless-stopped \
@@ -70,8 +70,8 @@ init-alias:
 license:
 	@echo -e "$(YELLOW)📄 Copie du fichier de licence...$(NC)"
 	@mkdir -p $$HOME/aistro/minio/minio.license
-	@cp minio.license $(LICENSE_PATH):/minio.license
-	@echo -e "$(GREEN)✅ Licence copiée vers $(LICENSE_PATH):/minio.license$(NC)"
+	@cp minio.license $(LICENSE_PATH)/minio.license
+	@echo -e "$(GREEN)✅ Licence copiée vers $(LICENSE_PATH)/minio.license$(NC)"
 	@echo -e "$(GREEN)✅ Enregistremet de la licence$(NC)"
 	mc license register $(ALIAS_NAME) --license $(LICENSE_PATH)
 	@echo -e "$(GREEN)✅ License activée$(NC)"
