@@ -47,6 +47,8 @@ deploy: ## Lance le conteneur MinIO AIstro
 	docker run -dt \
 		-p $(MINIO_API_PORT):9000 \
 		-p $(MINIO_CONSOLE_PORT):9001 \
+		-e MINIO_ROOT_USER:$(MINIO_ROOT_USER)
+		-e MINIO_ROOT_PASSWORD:$(MINIO_ROOT_PASSWORD)
 		-v $$HOME/aistro/minio/data:/mnt/data/aistro \
 		-v $(LICENSE_PATH):/minio.license \
 		-v $$HOME/aistro/minio/certs:/etc/aistro/minio/certs \
@@ -55,7 +57,7 @@ deploy: ## Lance le conteneur MinIO AIstro
 		quay.io/minio/aistor/minio:latest \
 		minio server /mnt/data/aistro \
 			--license /minio.license \
-			--console-address ":9001"
+			--console-address ":9011"
 	@echo -e "$(GREEN)✅ MinIO démarré !$(NC)"
 	@echo -e "$(GREEN)   • API     → http://localhost:$(MINIO_API_PORT)$(NC)"
 	@echo -e "$(GREEN)   • Console → http://localhost:$(MINIO_CONSOLE_PORT)$(NC)"
