@@ -43,9 +43,9 @@ setup: ## Installe le client mc (MinIO Client)
 
 license: ## Copie le fichier de licence MinIO sur le serveur
 	@echo -e "$(YELLOW)📄 Copie du fichier de licence...$(NC)"
-	@mkdir -p $$HOME/minio
-	@cp minio.license $$HOME/minio/minio.license
-	@echo -e "$(GREEN)✅ Licence copiée vers $$HOME/minio/minio.license$(NC)"
+	@mkdir -p $$HOME/aistro/minio
+	@cp minio.license $$HOME/aistro/minio/minio.license
+	@echo -e "$(GREEN)✅ Licence copiée vers $$HOME/aistro/minio/minio.license$(NC)"
 
  
 deploy: ## Lance le conteneur MinIO AIstro
@@ -55,9 +55,9 @@ deploy: ## Lance le conteneur MinIO AIstro
 		-p $(MINIO_CONSOLE_PORT):9001 \
 		-e MINIO_ROOT_USER="$(MINIO_ROOT_USER)" \
 		-e MINIO_ROOT_PASSWORD="$(MINIO_ROOT_PASSWORD)" \
-		-v $$HOME/minio/data:/mnt/data/aistro \
-		-v $$HOME/minio/minio.license:/minio.license \
-		-v $$HOME/minio/certs:/etc/minio/certs \
+		-v $$HOME/aistro/minio/data:/mnt/data/aistro \
+		-v $$HOME/aistro/minio/minio.license:/minio.license \
+		-v $$HOME/aistro/minio/certs:/etc/aistro/minio/certs \
 		--name "$(CONTAINER_NAME)" \
 		--restart unless-stopped \
 		quay.io/minio/aistor/minio:latest \
