@@ -2,7 +2,7 @@
 # Makefile MinIO - selys.app
 # ============================================
 
-.PHONY: help setup license deploy down restart logs status buckets nginx-setup nginx-remove ssl clean
+.PHONY: help setup init-alias license deploy down restart logs status buckets nginx-setup nginx-remove ssl clean
 
 # Chargement des variables d'environnement
 include .env
@@ -18,6 +18,8 @@ NC     := \033[0m
 DOMAIN_API     := $(API_DOMAIN)
 DOMAIN_CONSOLE := $(CONSOLE_DOMAIN)
 CONTAINER_NAME := aistor-server
+ALIAS_NAME := selysafrica
+LICENSE_PATH := $$HOME/aistro/minio/minio.license:/minio.license
 NGINX_AVAILABLE_DIR := /etc/nginx/sites-available
 NGINX_ENABLED_DIR   := /etc/nginx/sites-enabled
 
@@ -39,24 +41,14 @@ setup: ## Installe le client mc (MinIO Client)
 	sudo mv /tmp/mc /usr/local/bin/mc
 	@echo -e "$(GREEN)✅ mc installé :$(NC)"
 	mc --version
-
-
-license: ## Copie le fichier de licence MinIO sur le serveur
-	@echo -e "$(YELLOW)📄 Copie du fichier de licence...$(NC)"
-	@mkdir -p $$HOME/aistro/minio/minio.license
-	@cp minio.license $$HOME/aistro/minio/minio.license/minio.license
-	@echo -e "$(GREEN)✅ Licence copiée vers $$HOME/aistro/minio/minio.license/minio.license$(NC)"
-
  
 deploy: ## Lance le conteneur MinIO AIstro
 	@echo -e "$(YELLOW)🚀 Démarrage de MinIO AIstro...$(NC)"
 	docker run -dt \
 		-p $(MINIO_API_PORT):9000 \
 		-p $(MINIO_CONSOLE_PORT):9001 \
-		-e MINIO_ROOT_USER="$(MINIO_ROOT_USER)" \
-		-e MINIO_ROOT_PASSWORD="$(MINIO_ROOT_PASSWORD)" \
 		-v $$HOME/aistro/minio/data:/mnt/data/aistro \
-		-v $$HOME/aistro/minio/minio.license:/minio.license \
+		-v $(LICENSE_PATH) \
 		-v $$HOME/aistro/minio/certs:/etc/aistro/minio/certs \
 		--name "$(CONTAINER_NAME)" \
 		--restart unless-stopped \
@@ -67,6 +59,20 @@ deploy: ## Lance le conteneur MinIO AIstro
 	@echo -e "$(GREEN)✅ MinIO démarré !$(NC)"
 	@echo -e "$(GREEN)   • API     → http://localhost:$(MINIO_API_PORT)$(NC)"
 	@echo -e "$(GREEN)   • Console → http://localhost:$(MINIO_CONSOLE_PORT)$(NC)"
+
+
+init-alias:
+	@echo -e "$(YELLOW)📄 Init Alias...$(NC)"
+	mc alias set $(ALIAS_NAME) http://localhost:$(MINIO_API_PORT) $(MINIO_ROOT_USER) $(MINIO_ROOT_PASSWORD)
+
+license:
+	@echo -e "$(YELLOW)📄 Copie du fichier de licence...$(NC)"
+	@mkdir -p $$HOME/aistro/minio/minio.license
+	@cp minio.license $$HOME/aistro/minio/minio.license/minio.license
+	@echo -e "$(GREEN)✅ Licence copiée vers $$HOME/aistro/minio/minio.license/minio.license$(NC)"
+	@echo -e "$(GREEN)✅ Enregistremet de la licence$(NC)"
+	mc license register $(ALIAS_NAME) --license $(LICENSE_PATH)
+	@echo -e "$(GREEN)✅ License activée$(NC)"
 
 
 down: ## Arrête et supprime le conteneur MinIO
