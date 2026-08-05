@@ -43,7 +43,7 @@ setup: ## Installe le client mc (MinIO Client)
 
 license: ## Copie le fichier de licence MinIO sur le serveur
 	@echo -e "$(YELLOW)📄 Copie du fichier de licence...$(NC)"
-	@mkdir -p $$HOME/aistro/minio
+	@mkdir -p $$HOME/aistro/minio/minio.license
 	@cp minio.license $$HOME/aistro/minio/minio.license/minio.license
 	@echo -e "$(GREEN)✅ Licence copiée vers $$HOME/aistro/minio/minio.license/minio.license$(NC)"
 
