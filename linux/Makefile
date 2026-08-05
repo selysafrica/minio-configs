@@ -1,5 +1,5 @@
 # ============================================
-# Makefile MinIO - selys.app
+# Makefile MinIO - codihub.ci
 # ============================================
 
 .PHONY: help setup init-alias license deploy down restart logs status buckets nginx-setup nginx-remove ssl clean
@@ -18,7 +18,7 @@ NC     := \033[0m
 DOMAIN_API     := $(API_DOMAIN)
 DOMAIN_CONSOLE := $(CONSOLE_DOMAIN)
 CONTAINER_NAME := aistor-server
-ALIAS_NAME := selysafrica
+ALIAS_NAME := codihub
 LICENSE_PATH := $$HOME/aistro/minio/minio.license/minio.license
 NGINX_AVAILABLE_DIR := /etc/nginx/sites-available
 NGINX_ENABLED_DIR   := /etc/nginx/sites-enabled
@@ -105,9 +105,9 @@ buckets: ## Crée les buckets public et private
 
 nginx-setup: ## Installe les configs Nginx (nécessite sudo)
 	@echo -e "$(YELLOW)🌐 Installation des configs Nginx...$(NC)"
-	@sudo cp nginx/s3.codihub.ci.conf    $(NGINX_AVAILABLE_DIR)/$(DOMAIN_API)
+	@sudo cp nginx/s3.codihub.ci.conf $(NGINX_AVAILABLE_DIR)/$(DOMAIN_API)
 	@sudo cp nginx/minio.codihub.ci.conf $(NGINX_AVAILABLE_DIR)/$(DOMAIN_CONSOLE)
-	@sudo ln -sf $(NGINX_AVAILABLE_DIR)/$(DOMAIN_API)     $(NGINX_ENABLED_DIR)/$(DOMAIN_API)     2>/dev/null || true
+	@sudo ln -sf $(NGINX_AVAILABLE_DIR)/$(DOMAIN_API) $(NGINX_ENABLED_DIR)/$(DOMAIN_API)     2>/dev/null || true
 	@sudo ln -sf $(NGINX_AVAILABLE_DIR)/$(DOMAIN_CONSOLE) $(NGINX_ENABLED_DIR)/$(DOMAIN_CONSOLE) 2>/dev/null || true
 	@sudo nginx -t && sudo systemctl reload nginx
 	@echo -e "$(GREEN)✅ Nginx configuré !$(NC)"
