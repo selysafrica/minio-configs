@@ -21,13 +21,6 @@ CONTAINER_NAME := aistor-server
 NGINX_AVAILABLE_DIR := /etc/nginx/sites-available
 NGINX_ENABLED_DIR   := /etc/nginx/sites-enabled
 
-MINIO_API_PORT
-MINIO_CONSOLE_PORT
-MINIO_ROOT_USER
-MINIO_ROOT_PASSWORD
-MINIO_BROWSER_REDIRECT_URL
-MINIO_DOMAIN
-
 
 help: ## Affiche cette aide
 	@echo ""
