@@ -54,7 +54,7 @@ license: ## Copie le fichier de licence MinIO sur le serveur
 	@cp minio.license $$HOME/minio/minio.license
 	@echo -e "$(GREEN)✅ Licence copiée vers $$HOME/minio/minio.license$(NC)"
 
-
+ 
 deploy: ## Lance le conteneur MinIO AIstro
 	@echo -e "$(YELLOW)🚀 Démarrage de MinIO AIstro...$(NC)"
 	docker run -dt \
