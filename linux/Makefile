@@ -47,8 +47,8 @@ deploy: ## Lance le conteneur MinIO AIstro
 	docker run -dt \
 		-p $(MINIO_API_PORT):9000 \
 		-p $(MINIO_CONSOLE_PORT):9001 \
-		-e MINIO_ROOT_USER=$(MINIO_ROOT_USER)
-		-e MINIO_ROOT_PASSWORD=$(MINIO_ROOT_PASSWORD)
+		-e MINIO_ROOT_USER=$(MINIO_ROOT_USER) \
+		-e MINIO_ROOT_PASSWORD=$(MINIO_ROOT_PASSWORD) \
 		-v $$HOME/aistro/minio/data:/mnt/data/aistro \
 		-v $(LICENSE_PATH):/minio.license \
 		-v $$HOME/aistro/minio/certs:/etc/aistro/minio/certs \
