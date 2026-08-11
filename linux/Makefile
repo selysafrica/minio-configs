@@ -1,8 +1,8 @@
 # ============================================
-# Makefile MinIO - codihub.ci
+# Makefile MinIO AIstro - codihub.ci (cPanel / Apache)
 # ============================================
 
-.PHONY: help setup init-alias license deploy down restart logs status buckets nginx-setup nginx-remove ssl clean
+.PHONY: help setup init-alias license deploy down restart logs status buckets apache-setup apache-remove apache-modules ssl clean
 
 # Chargement des variables d'environnement
 include .env
@@ -21,14 +21,15 @@ CONTAINER_NAME := aistor-server
 ALIAS_NAME := codihub
 LICENSE_DIR  := $$HOME/aistro/minio
 LICENSE_PATH := $$HOME/aistro/minio/minio.license
-NGINX_AVAILABLE_DIR := /etc/nginx/sites-available
-NGINX_ENABLED_DIR   := /etc/nginx/sites-enabled
+
+# cPanel Apache include directory
+CPANEL_INCLUDES := /etc/apache2/conf.d/includes
 
 
 help: ## Affiche cette aide
 	@echo ""
 	@echo -e "$(CYAN)╔════════════════════════════════════════════════════════════╗$(NC)"
-	@echo -e "$(CYAN)║           MinIO AIstro - Commandes disponibles             ║$(NC)"
+	@echo -e "$(CYAN)║      MinIO AIstro (cPanel) - Commandes disponibles        ║$(NC)"
 	@echo -e "$(CYAN)╚════════════════════════════════════════════════════════════╝$(NC)"
 	@echo ""
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  $(CYAN)%-18s$(NC) %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -42,7 +43,7 @@ setup: ## Installe le client mc (MinIO Client)
 	sudo mv /tmp/mc /usr/local/bin/mc
 	@echo -e "$(GREEN)✅ mc installé :$(NC)"
 	mc --version
- 
+
 deploy: ## Lance le conteneur MinIO AIstro
 	@echo -e "$(YELLOW)🚀 Démarrage de MinIO AIstro...$(NC)"
 	docker run -dt \
@@ -64,17 +65,17 @@ deploy: ## Lance le conteneur MinIO AIstro
 	@echo -e "$(GREEN)   • Console → http://localhost:$(MINIO_CONSOLE_PORT)$(NC)"
 
 
-init-alias:
+init-alias: ## Configure l'alias mc
 	@echo -e "$(YELLOW)📄 Init Alias...$(NC)"
 	mc alias set $(ALIAS_NAME) http://localhost:$(MINIO_API_PORT) $(MINIO_ROOT_USER) $(MINIO_ROOT_PASSWORD)
 
-license:
+license: ## Copie et enregistre la licence MinIO
 	@echo -e "$(YELLOW)📄 Copie du fichier de licence...$(NC)"
 	@mkdir -p $(LICENSE_DIR)
-	@cp minio.license $(LICENSE_PATH)/minio.license
-	@echo -e "$(GREEN)✅ Licence copiée vers $(LICENSE_PATH)/minio.license$(NC)"
+	@cp minio.license $(LICENSE_PATH)
+	@echo -e "$(GREEN)✅ Licence copiée vers $(LICENSE_PATH)$(NC)"
 	@echo -e "$(GREEN)✅ Enregistrement de la licence$(NC)"
-	mc license register $(ALIAS_NAME) --license $(LICENSE_PATH)/minio.license
+	mc license register $(ALIAS_NAME) --license $(LICENSE_PATH)
 	@echo -e "$(GREEN)✅ License activée$(NC)"
 
 
@@ -104,29 +105,40 @@ buckets: ## Crée les buckets public et private
 	@bash scripts/setup-buckets.sh
 
 
-nginx-setup: ## Installe les configs Nginx (nécessite sudo)
-	@echo -e "$(YELLOW)🌐 Installation des configs Nginx...$(NC)"
-	@sudo cp nginx/s3.codihub.ci.conf $(NGINX_AVAILABLE_DIR)/$(DOMAIN_API)
-	@sudo cp nginx/minio.codihub.ci.conf $(NGINX_AVAILABLE_DIR)/$(DOMAIN_CONSOLE)
-	@sudo ln -sf $(NGINX_AVAILABLE_DIR)/$(DOMAIN_API) $(NGINX_ENABLED_DIR)/$(DOMAIN_API)     2>/dev/null || true
-	@sudo ln -sf $(NGINX_AVAILABLE_DIR)/$(DOMAIN_CONSOLE) $(NGINX_ENABLED_DIR)/$(DOMAIN_CONSOLE) 2>/dev/null || true
-	@sudo nginx -t && sudo systemctl reload nginx
-	@echo -e "$(GREEN)✅ Nginx configuré !$(NC)"
+apache-modules: ## Active les modules Apache nécessaires (proxy, rewrite, headers)
+	@echo -e "$(YELLOW)🔧 Activation des modules Apache...$(NC)"
+	@sudo a2enmod proxy proxy_http proxy_wstunnel rewrite headers ssl 2>/dev/null || true
+	@echo -e "$(GREEN)✅ Modules Apache activés.$(NC)"
 
 
-nginx-remove: ## Supprime les configs Nginx
-	@echo -e "$(YELLOW)🗑️  Suppression des configs Nginx...$(NC)"
-	@sudo rm -f $(NGINX_ENABLED_DIR)/$(DOMAIN_API)
-	@sudo rm -f $(NGINX_ENABLED_DIR)/$(DOMAIN_CONSOLE)
-	@sudo rm -f $(NGINX_AVAILABLE_DIR)/$(DOMAIN_API)
-	@sudo rm -f $(NGINX_AVAILABLE_DIR)/$(DOMAIN_CONSOLE)
-	@sudo systemctl reload nginx
-	@echo -e "$(GREEN)✅ Configs Nginx supprimées !$(NC)"
+apache-setup: apache-modules ## Installe les configs Apache pour cPanel
+	@echo -e "$(YELLOW)🌐 Installation des configs Apache...$(NC)"
+	@sudo mkdir -p $(CPANEL_INCLUDES)
+	@sudo cp apache/s3.codihub.ci.conf $(CPANEL_INCLUDES)/s3.codihub.ci.conf
+	@sudo cp apache/minio.codihub.ci.conf $(CPANEL_INCLUDES)/minio.codihub.ci.conf
+	@sudo /scripts/rebuildhttpdconf 2>/dev/null || true
+	@sudo apachectl configtest && sudo apachectl graceful
+	@echo -e "$(GREEN)✅ Apache configuré !$(NC)"
+	@echo -e "$(CYAN)   API S3    : http://$(DOMAIN_API)$(NC)"
+	@echo -e "$(CYAN)   Console   : http://$(DOMAIN_CONSOLE)$(NC)"
 
 
-ssl: ## Génère les certificats SSL avec Certbot
+apache-remove: ## Supprime les configs Apache
+	@echo -e "$(YELLOW)🗑️  Suppression des configs Apache...$(NC)"
+	@sudo rm -f $(CPANEL_INCLUDES)/s3.codihub.ci.conf
+	@sudo rm -f $(CPANEL_INCLUDES)/minio.codihub.ci.conf
+	@sudo /scripts/rebuildhttpdconf 2>/dev/null || true
+	@sudo apachectl graceful
+	@echo -e "$(GREEN)✅ Configs Apache supprimées !$(NC)"
+
+
+ssl: ## Génère les certificats SSL via cPanel AutoSSL ou Certbot
 	@echo -e "$(YELLOW)🔒 Génération des certificats SSL...$(NC)"
-	@sudo certbot --nginx -d $(API_DOMAIN) -d $(CONSOLE_DOMAIN) --non-interactive --agree-tos --email $(LETSENCRYPT_EMAIL)
+	@echo -e "$(CYAN)Option 1 — AutoSSL cPanel (recommandé) :$(NC)"
+	@echo -e "$(CYAN)   WHM > SSL/TLS > Manage AutoSSL$(NC)"
+	@echo -e ""
+	@echo -e "$(CYAN)Option 2 — Certbot :$(NC)"
+	@sudo certbot --apache -d $(API_DOMAIN) -d $(CONSOLE_DOMAIN) --non-interactive --agree-tos --email $(LETSENCRYPT_EMAIL)
 	@echo -e "$(GREEN)✅ Certificats SSL générés !$(NC)"
 
 
