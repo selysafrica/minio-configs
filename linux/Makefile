@@ -71,10 +71,10 @@ init-alias:
 license:
 	@echo -e "$(YELLOW)📄 Copie du fichier de licence...$(NC)"
 	@mkdir -p $(LICENSE_DIR)
-	@cp minio.license $(LICENSE_PATH)
-	@echo -e "$(GREEN)✅ Licence copiée vers $(LICENSE_PATH)$(NC)"
+	@cp minio.license $(LICENSE_PATH)/minio.license
+	@echo -e "$(GREEN)✅ Licence copiée vers $(LICENSE_PATH)/minio.license$(NC)"
 	@echo -e "$(GREEN)✅ Enregistrement de la licence$(NC)"
-	mc license register $(ALIAS_NAME) --license $(LICENSE_PATH)
+	mc license register $(ALIAS_NAME) --license $(LICENSE_PATH)/minio.license
 	@echo -e "$(GREEN)✅ License activée$(NC)"
 
 
