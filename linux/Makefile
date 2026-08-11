@@ -132,14 +132,11 @@ apache-remove: ## Supprime les configs Apache
 	@echo -e "$(GREEN)✅ Configs Apache supprimées !$(NC)"
 
 
-ssl: ## Génère les certificats SSL via cPanel AutoSSL ou Certbot
-	@echo -e "$(YELLOW)🔒 Génération des certificats SSL...$(NC)"
-	@echo -e "$(CYAN)Option 1 — AutoSSL cPanel (recommandé) :$(NC)"
-	@echo -e "$(CYAN)   WHM > SSL/TLS > Manage AutoSSL$(NC)"
-	@echo -e ""
-	@echo -e "$(CYAN)Option 2 — Certbot :$(NC)"
-	@sudo certbot --apache -d $(API_DOMAIN) -d $(CONSOLE_DOMAIN) --non-interactive --agree-tos --email $(LETSENCRYPT_EMAIL)
-	@echo -e "$(GREEN)✅ Certificats SSL générés !$(NC)"
+ssl: ## Lance AutoSSL cPanel pour les domaines MinIO
+	@echo -e "$(YELLOW)🔒 Lancement d'AutoSSL pour $(DOMAIN_API) et $(DOMAIN_CONSOLE)...$(NC)"
+	@sudo /usr/local/cpanel/bin/autossl_check --force
+	@echo -e "$(GREEN)✅ AutoSSL lancé ! Les certificats seront générés sous quelques minutes.$(NC)"
+	@echo -e "$(CYAN)   Vérifiez le statut dans : WHM > SSL/TLS > Manage AutoSSL$(NC)"
 
 
 clean: ## Supprime le conteneur, les données et les volumes MinIO
