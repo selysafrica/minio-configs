@@ -134,7 +134,7 @@ apache-remove: ## Supprime les configs Apache
 
 ssl: ## Lance AutoSSL cPanel pour les domaines MinIO
 	@echo -e "$(YELLOW)🔒 Lancement d'AutoSSL pour $(DOMAIN_API) et $(DOMAIN_CONSOLE)...$(NC)"
-	@sudo /usr/local/cpanel/bin/autossl_check --force
+	@sudo /usr/local/cpanel/bin/autossl_check --all
 	@echo -e "$(GREEN)✅ AutoSSL lancé ! Les certificats seront générés sous quelques minutes.$(NC)"
 	@echo -e "$(CYAN)   Vérifiez le statut dans : WHM > SSL/TLS > Manage AutoSSL$(NC)"
 
