@@ -72,6 +72,7 @@ init-alias: ## Configure l'alias mc
 license: ## Copie et enregistre la licence MinIO
 	@echo -e "$(YELLOW)📄 Copie du fichier de licence...$(NC)"
 	@mkdir -p $(LICENSE_DIR)
+	@test ! -d $(LICENSE_PATH) || (echo -e "$(RED)⚠️  $(LICENSE_PATH) est un dossier, suppression...$(NC)" && rm -rf $(LICENSE_PATH))
 	@cp minio.license $(LICENSE_PATH)
 	@echo -e "$(GREEN)✅ Licence copiée vers $(LICENSE_PATH)$(NC)"
 	@echo -e "$(GREEN)✅ Enregistrement de la licence$(NC)"
