@@ -51,6 +51,9 @@ deploy: ## Lance le conteneur MinIO AIstro
 		-p $(MINIO_CONSOLE_PORT):9001 \
 		-e MINIO_ROOT_USER=$(MINIO_ROOT_USER) \
 		-e MINIO_ROOT_PASSWORD=$(MINIO_ROOT_PASSWORD) \
+		-e MINIO_BROWSER_REDIRECT_URL=$(MINIO_BROWSER_REDIRECT_URL) \
+		-e MINIO_DOMAIN=$(MINIO_DOMAIN) \
+		-e MINIO_SERVER_URL=$(MINIO_SERVER_URL) \
 		-v $$HOME/aistro/minio/data:/mnt/data/aistro \
 		-v $(LICENSE_PATH):/minio.license \
 		-v $$HOME/aistro/minio/certs:/etc/aistro/minio/certs \
